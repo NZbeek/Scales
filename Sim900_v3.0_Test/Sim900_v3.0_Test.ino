@@ -1,100 +1,108 @@
-#include <GSM.h>
-#include <Wire.h>
 #include <RTClib.h>
+#include <Wire.h>
+#include <SoftwareSerial.h>
 
-// initialize the library instance
-GPRS gprsAccess;  // GPRS access
-GSM gsmAccess;    // GSM access: include a 'true' parameter for debug enabled
-GSMClient client;  // Client service for TCP connection
 
-GSM3ShieldV1DirectModemProvider modemAccess;
+SoftwareSerial GPRS(7,8);  //SoftwareSerial mySerial(7, 8); //set pins to communicate with GSM sheild
 
-RTC_DS1307 RTC;
 
-// PIN Number
-#define PINNUMBER "xxxx"
+RTC_DS3231 RTC;
 
-// APN info
-char apn[] = {"xxx"};
-char login[] = {""};
-char password[] = {""};
 
-void setup(){
-  Serial.begin(9600);
-  Wire.begin();
+void setup()
+{
+  GPRS.begin(19200);
+  Serial.begin(19200);
   RTC.begin();
-  
-  connectGSM();
+  Wire.begin();
+  ConnectNetwork();
+  GetDateTime();
+
   
   //show old datetime from RTC
   showDate("Old datetime: ",RTC.now());
-  
+
   syncRTCwithGSM(getGSMTimestamp(),RTC);
   
   //show new datetime from RTC, synced with GSM module
   showDate("New datetime: ",RTC.now());
 }
-void loop(){  
-}
 
 
-
-////GSM Functions, these use GSM Lib but I use SoftwareSerial///
-void connectGSM(){
-  boolean notConnected=true;
-  Serial.println("Connecting to GSM network...");
-  while(notConnected){
-    if(gsmAccess.begin(PINNUMBER) == GSM_READY)
-      notConnected = false;
-    else delay(1000);
-  }
-  Serial.println("Connected to GSM, now GPRS...");
-
-  // 1000ms bug
-  delay(1000);
+void loop()
+{
   
-  while(gprsAccess.attachGPRS(apn, login, password)!=GPRS_READY){
-    delay(1000);
-  }
-  Serial.println("GSM shield fully connected.");
+ 
 }
 
+
+
+/////return current Date/Time and attach to string getGSMTimestamp///
 String getGSMTimestamp(){
   boolean notConnected = true;
   
   return send_AT_Command("AT+CCLK?",1000);
 }
 
-void setGSMRTCSyncServer(){
-  // set server
-  send_AT_Command("AT+QNTP=\"time1.google.com\"",2000);
-
-  // execute sync
-  send_AT_Command("AT+QNTP",1000);  
-}
-
-String getGSMRTCSyncServer(){
-  // get server
-  return send_AT_Command("AT+QNTP?",1000);
-}
-
-void GSMRTCSync(){
-  send_AT_Command("AT+QNTP",1000);   
-}
-
 String send_AT_Command(String AT_COMMAND, int tDelay){
-  /*Serial.print("COMMAND: "+AT_COMMAND);
-  Serial.println(modemAccess.writeModemCommand(AT_COMMAND,tDelay));
-  Serial.println("-----------------------------------------------");*/
   
-  return modemAccess.writeModemCommand(AT_COMMAND,tDelay);
+  return //////this return needs to return the date/time result which is printed to the serial monitor from ("AT+CCLK")/// (AT_COMMAND,tDelay);
 }
 
 
 
-/////RTC Functions, should remain same////
+/////connect to GSM network////
+void ConnectNetwork()
+{
+  boolean notConnected=true;
+  GPRS.println("AT+CGATT=1"); // Attach from GPRS serivce
+  Response();
+  delay(1000);
+  GPRS.println("AT+CSTT=\"internet\""); // Start task and set APN
+  delay(3000);
+  Response();
+  GPRS.println("AT+CIICR"); // Bring up wireless connection with GPRS
+  delay(2000);
+  Response();
+  GPRS.println("AT+CIFSR"); // Get local IP address
+  Response();
+  GPRS.println("AT+CIPSPRT=1"); // Set its prompt echo '>'and shows "send ok" when sending is successful
+  Response();
+  GPRS.println("AT+CIPQSEND=0"); // Set normal data transmitting mode
+  Response();
+}
 
-void syncRTCwithGSM(String CCLK_Return, RTC_DS1307 myRTC){
+
+
+////close connection function///
+void CloseConnection()
+{
+  GPRS.println("AT+CIPCLOSE"); // Close TCP connection
+  Response();
+  delay(3000);
+}
+
+
+
+////Get time function////
+void GetDateTime()
+{
+  
+  delay(500);
+  GPRS.println("AT+CLTS=1"); //get current date & time from network
+  delay(500);
+  Response();
+  GPRS.println("AT+CCLK?"); //display timestamp
+  Response();
+  delay(500);
+
+}
+
+
+
+
+////use Date/Time returned from network to update RTC date/time///
+void syncRTCwithGSM(String CCLK_Return, RTC_DS3231 myRTC){
   DateTime datetime;
   
   char datetime_year[3];
@@ -142,4 +150,19 @@ void showDate(const char* txt, const DateTime& dt) {
     Serial.print(dt.second(), DEC);
     Serial.println();
 }
+
+
+////Response function to show result from network prompt////
+void Response()
+{
+  delay(100);
+  while(!GPRS.available());
+  if(GPRS.available()){
+    while(GPRS.available()){
+      Serial.write(GPRS.read());
+    }
+  }
+}
+
+
 
