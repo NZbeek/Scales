@@ -1,4 +1,5 @@
- 
+
+
 #include <SoftwareSerial.h>
 #include <EEPROM.h> // build-in IDE libary
 #include <HX711.h> // libary used: BOGDE HX711 from Github

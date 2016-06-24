@@ -1,3 +1,5 @@
+
+
  
 #include <SoftwareSerial.h>
 #include <EEPROM.h> // build-in IDE libary
@@ -137,6 +139,72 @@ void GetDateTime()
 
 
 
+///Green LED Blink Function///
+void GreenLEDBlink()
+{
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW);// turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW);// turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW);//turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW);// turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW);// turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added
+    delay (1000); // changed from 100
+    digitalWrite(greenPin, LOW); //turn LED off, added
+    delay (500);
+    digitalWrite(greenPin, HIGH);// turn LED on, added 
+}
+
+
+/////end of function////
+
+
+//////Red LED Blink Function////
+void RedLEDBlink()
+{
+    digitalWrite(redPin, LOW);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, HIGH);// turn LED on, added
+    delay(500);
+    digitalWrite(redPin, LOW);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, HIGH);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, LOW);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, HIGH);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, LOW);// turn LED on, added
+    delay(500);
+    digitalWrite(redPin, HIGH);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, LOW);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, HIGH);// turn LED off, added
+    delay(500);
+    digitalWrite(redPin, LOW);// turn LED off, added
+    delay(500);
+}
+
+//////end of function//////
+
+
+
+
 ////Get raw value reading///
 void RawValue()
 {
@@ -171,31 +239,7 @@ void CalibrationMode()
     ValueATemp = ForceValueRaw;  // store the 0 load value in a variable
     Serial.println ("Calibration started >> Place calibration load on scales");
     CounterPulse = 2;
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW);// turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW);// turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW);//turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW);// turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW);// turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
-    delay (1000); // changed from 100
-    digitalWrite(greenPin, LOW); //turn LED off, added
-    delay (500);
-    digitalWrite(greenPin, HIGH);// turn LED on, added
+    GreenLEDBlink();
   }
 
   if (CounterPulse == 3)
@@ -218,28 +262,7 @@ void CalibrationMode()
     delay (10); //changed from 10
     CounterPulse = 0; // reset of Pulse counter
     delay(5000);
-    digitalWrite(redPin, LOW);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, HIGH);// turn LED on, added
-    delay(500);
-    digitalWrite(redPin, LOW);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, HIGH);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, LOW);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, HIGH);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, LOW);// turn LED on, added
-    delay(500);
-    digitalWrite(redPin, HIGH);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, LOW);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, HIGH);// turn LED off, added
-    delay(500);
-    digitalWrite(redPin, LOW);// turn LED off, added
-    delay(500);
+    RedLEDBlink();
     asm volatile ("  jmp 0"); // invoke restart of arduino
   }
 }
